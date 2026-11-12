@@ -1,0 +1,20 @@
+# data stays local (exports can be large)
+data/raw/*
+data/processed/*
+!data/**/.gitkeep
+# secrets and credentials
+.env
+*.json.key
+.databrickscfg
+credentials*
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+# os
+.DS_Store
+
+# private Claude notes
+CLAUDE.local.md
+*.egg-info/

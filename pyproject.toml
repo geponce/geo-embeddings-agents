@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geo-embeddings"
+version = "0.1.0"
+description = "Validated land-cover insight from Google Satellite Embeddings on Databricks"
+requires-python = ">=3.11"
+# The full environment is managed by environment.yml (conda).
+# These are the packages the src/ code imports directly.
+dependencies = [
+    "earthengine-api",
+    "google-auth",
+    "python-dotenv",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

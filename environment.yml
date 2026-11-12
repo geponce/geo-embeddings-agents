@@ -1,0 +1,24 @@
+name: geo-embeddings
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - earthengine-api
+  - geemap
+  - geopandas
+  - rasterio
+  - xarray
+  - pandas
+  - numpy
+  - scikit-learn
+  - matplotlib
+  - jupyterlab
+  - pytest
+  - python-dotenv
+  - pip
+  - pip:
+      - -e .
+      - databricks-sdk
+      - databricks-connect
+      - mlflow
+      - claude-agent-sdk
