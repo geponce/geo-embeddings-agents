@@ -1,0 +1,119 @@
+{
+  "year": 2024,
+  "k": 50,
+  "min_dist_m": 10000,
+  "per_class": [
+    {
+      "class_name": "Shrubland",
+      "n_queries": 30,
+      "share_of_county": 0.8377490492546502,
+      "precision_naive": 0.9746666666666667,
+      "precision_beyond_10km": 0.9733333333333334,
+      "lift_beyond_10km": 1.1618435547009134
+    },
+    {
+      "class_name": "Cotton",
+      "n_queries": 30,
+      "share_of_county": 0.01803107973603512,
+      "precision_naive": 0.9226666666666666,
+      "precision_beyond_10km": 0.9253333333333333,
+      "lift_beyond_10km": 51.31879770261646
+    },
+    {
+      "class_name": "Alfalfa",
+      "n_queries": 30,
+      "share_of_county": 0.01739533171088136,
+      "precision_naive": 0.8140000000000001,
+      "precision_beyond_10km": 0.7986666666666667,
+      "lift_beyond_10km": 45.91270117413594
+    },
+    {
+      "class_name": "Small grains",
+      "n_queries": 30,
+      "share_of_county": 0.004841465730017087,
+      "precision_naive": 0.8060000000000002,
+      "precision_beyond_10km": 0.7886666666666665,
+      "lift_beyond_10km": 162.8983267973856
+    },
+    {
+      "class_name": "Corn+Sorghum",
+      "n_queries": 30,
+      "share_of_county": 0.00553187082520669,
+      "precision_naive": 0.7959999999999998,
+      "precision_beyond_10km": 0.7680000000000001,
+      "lift_beyond_10km": 138.83187519500783
+    },
+    {
+      "class_name": "Developed",
+      "n_queries": 30,
+      "share_of_county": 0.027475246100649556,
+      "precision_naive": 0.65,
+      "precision_beyond_10km": 0.622,
+      "lift_beyond_10km": 22.638559731965238
+    },
+    {
+      "class_name": "Fallow/Idle",
+      "n_queries": 30,
+      "share_of_county": 0.02079557680469015,
+      "precision_naive": 0.6699999999999999,
+      "precision_beyond_10km": 0.6006666666666667,
+      "lift_beyond_10km": 28.884347489279293
+    },
+    {
+      "class_name": "Orchards",
+      "n_queries": 30,
+      "share_of_county": 0.0009004033116431066,
+      "precision_naive": 0.5860000000000001,
+      "precision_beyond_10km": 0.46666666666666673,
+      "lift_beyond_10km": 518.2862619808307
+    },
+    {
+      "class_name": "Other crops",
+      "n_queries": 30,
+      "share_of_county": 0.0034347653485682725,
+      "precision_naive": 0.6706666666666666,
+      "precision_beyond_10km": 0.44,
+      "lift_beyond_10km": 128.1019095477387
+    },
+    {
+      "class_name": "Grass/Pasture",
+      "n_queries": 30,
+      "share_of_county": 0.0493294440512971,
+      "precision_naive": 0.49066666666666675,
+      "precision_beyond_10km": 0.39866666666666667,
+      "lift_beyond_10km": 8.081718217867973
+    },
+    {
+      "class_name": "Double crop",
+      "n_queries": 30,
+      "share_of_county": 0.0009435536300924567,
+      "precision_naive": 0.4773333333333333,
+      "precision_beyond_10km": 0.3653333333333333,
+      "lift_beyond_10km": 387.18873170731706
+    },
+    {
+      "class_name": "Barren",
+      "n_queries": 30,
+      "share_of_county": 0.006023784455529282,
+      "precision_naive": 0.6186666666666667,
+      "precision_beyond_10km": 0.29333333333333333,
+      "lift_beyond_10km": 48.69585482330468
+    },
+    {
+      "class_name": "Woody",
+      "n_queries": 30,
+      "share_of_county": 0.007548429040739654,
+      "precision_naive": 0.424,
+      "precision_beyond_10km": 0.2746666666666666,
+      "lift_beyond_10km": 36.38726219512195
+    }
+  ],
+  "vector_search_vs_exact": {
+    "n_queries": 20,
+    "k": 50,
+    "mean_recall": 0.842,
+    "min_recall": 0.54,
+    "latency_ms_median": 245.75856246519834,
+    "latency_ms_p90": 314.4684292841703
+  }
+}

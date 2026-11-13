@@ -4,6 +4,10 @@
 
 > Work in progress. This README grows as each stage is completed.
 
+![Architecture of geo-embeddings-agents](docs/architecture.svg)
+
+Read [how it works](docs/overview.md) for the datasets, the pipeline, why Databricks and H3, and what the validation shows.
+
 ## Why
 Satellite embeddings compress a year of observations for every 10 m pixel into 64 numbers. They make it easy to ask "where else looks like this?" But an embedding is only useful if we know when to trust it. This project puts validation at the center.
 
@@ -46,6 +50,22 @@ These steps reproduce the current state of the project.
    python -m geo_embeddings.build_samples        # writes data/processed/*.parquet
    databricks/load_samples.sh                    # creates workspace.geo_embeddings.samples_pinal
    ```
+7. Train and validate the classifier (Stage 3). Add `--mlflow` to log the run to Databricks.
+   ```
+   python -m geo_embeddings.train_baseline       # 10 km spatial block CV
+   python -m geo_embeddings.train_baseline --cv random
+   python -m geo_embeddings.failure_analysis
+   ```
+8. Build the wall-to-wall grid, change score, H3 table and search index (Stage 4).
+   ```
+   python -m geo_embeddings.build_grid           # about 5 minutes, writes the 200 m grid
+   databricks/load_grid.sh                       # creates workspace.geo_embeddings.grid_pinal_200m
+   databricks/run_sql.sh databricks/sql/create_h3_table.sql
+   python -m geo_embeddings.change_analysis
+   python -m geo_embeddings.h3_map
+   python -c "from geo_embeddings.search import *; w = workspace_client(); ensure_endpoint(w); ensure_index(w)"
+   python -m geo_embeddings.search_eval --vs     # after the index finishes syncing
+   ```
 
 ## Data so far
 52,000 labeled pixels from Pinal County, Arizona. For 2023 and 2024 there are 2,000 pixels for each of 13 land-cover classes grouped from the Cropland Data Layer. Each pixel has its 64 embedding values, its original CDL code and location. Only pixels inside a uniform 90 m block of one class are kept, which avoids label errors at field edges.
@@ -62,6 +82,12 @@ A Random Forest on the 64 embedding values, validated with 5-fold cross-validati
 - Errors follow the reference label quality. Where the 2023 CDL confidence is under 50%, the model disagrees with CDL 30% of the time. At 99 to 100% confidence it disagrees 4% of the time.
 - Cotton and Developed are the most reliable classes (F1 about 0.97). Double crop is the weakest (F1 0.78) and is mostly confused with its own component crops. Orchards scores F1 0.89, but the interval runs from 0.72 to 0.97 because one farm block holds about a quarter of its samples.
 - These numbers measure agreement with CDL on a class-balanced sample of pure pixels. They are not the accuracy of a wall-to-wall map.
+
+## Results so far (Stage 4)
+- **Change.** One minus the cosine similarity of a place's 2023 and 2024 embeddings is a change score. It separates crop rotations from stable land with AUC 0.98 and crop to fallow with AUC 0.97. For flips between natural CDL classes it is near chance (0.56), which suggests many of those flips are relabeling.
+- **A burn scar the labels miss.** The strongest change outside farmland sits inside an area NASA MODIS maps as burned in mid 2024. The CDL still calls it shrubland.
+- **Find places like this one.** A Databricks Vector Search index over 696,008 grid vectors returns places of the same CDL class for 93% of matches more than 10 km from a cotton query. It agrees with exact search on answer quality.
+- **H3.** The grid rolls up to 2,455 H3 hexagons in Databricks SQL, where the change score is computed as array math and matches Python exactly.
 
 Figures are in `docs/figures/`, metrics in `docs/results/`, and every run is logged to MLflow on Databricks. To reproduce, run `python -m geo_embeddings.train_baseline` (add `--cv random` for the comparison and `--mlflow` to log the run).
 

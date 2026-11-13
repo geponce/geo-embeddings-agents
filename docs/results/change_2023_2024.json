@@ -1,0 +1,90 @@
+{
+  "all_nodes": [
+    {
+      "transition": "no change",
+      "n": 289015,
+      "median_change": 0.027226288761247663,
+      "auc": NaN
+    },
+    {
+      "transition": "crop <-> fallow",
+      "n": 6773,
+      "median_change": 0.28932179080891496,
+      "auc": 0.9390142377088142
+    },
+    {
+      "transition": "crop to crop",
+      "n": 5146,
+      "median_change": 0.37673591594523725,
+      "auc": 0.9687231593587179
+    },
+    {
+      "transition": "farm <-> natural",
+      "n": 16352,
+      "median_change": 0.05235611753006619,
+      "auc": 0.7654231468697597
+    },
+    {
+      "transition": "natural to natural",
+      "n": 22543,
+      "median_change": 0.029537370375864236,
+      "auc": 0.5433533606405515
+    },
+    {
+      "transition": "to/from developed",
+      "n": 7650,
+      "median_change": 0.030660050429363428,
+      "auc": 0.5711347840348878
+    },
+    {
+      "transition": "any change",
+      "n": 58464,
+      "median_change": 0.04279923525555218,
+      "auc": 0.6923780106469437
+    }
+  ],
+  "pure_both_years": [
+    {
+      "transition": "no change",
+      "n": 229515,
+      "median_change": 0.02657651918516457,
+      "auc": NaN
+    },
+    {
+      "transition": "crop <-> fallow",
+      "n": 3647,
+      "median_change": 0.3753679160873201,
+      "auc": 0.9729835008540589
+    },
+    {
+      "transition": "crop to crop",
+      "n": 2982,
+      "median_change": 0.43906267007340904,
+      "auc": 0.9835172725129286
+    },
+    {
+      "transition": "farm <-> natural",
+      "n": 4010,
+      "median_change": 0.07835698329814039,
+      "auc": 0.8604865165365784
+    },
+    {
+      "transition": "natural to natural",
+      "n": 2579,
+      "median_change": 0.02899165807216042,
+      "auc": 0.5577527293696352
+    },
+    {
+      "transition": "to/from developed",
+      "n": 1097,
+      "median_change": 0.031287875160253,
+      "auc": 0.5970746644598015
+    },
+    {
+      "transition": "any change",
+      "n": 14315,
+      "median_change": 0.15631066910094615,
+      "auc": 0.8400492812795444
+    }
+  ]
+}

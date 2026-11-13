@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="1200" height="760" role="img" aria-labelledby="t d" font-family="Archivo, 'Helvetica Neue', Arial, sans-serif">
+  <title id="t">geo-embeddings-agents architecture</title>
+  <desc id="d">Open satellite and label data flow through Google Earth Engine into a Databricks lakehouse (Unity Catalog, Delta tables, serverless SQL with H3, MLflow, Vector Search), then to Claude agents that answer plain-language questions. A validation spine runs under every step.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4F5D66"/>
+    </marker>
+    <style>
+      .h { font-size: 11px; font-weight: 700; letter-spacing: 1.6px; }
+      .ct { font-size: 13px; font-weight: 700; fill: #14222C; }
+      .cs { font-size: 11.5px; fill: #4F5D66; }
+      .st { font-size: 11.5px; font-weight: 700; fill: #14222C; }
+      .ss { font-size: 10.5px; fill: #4F5D66; }
+      .mono { font-family: 'JetBrains Mono', Menlo, Consolas, monospace; }
+      .card { fill: #FFFFFF; stroke: #C9D2D0; stroke-width: 1; }
+      .flow { stroke: #4F5D66; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+      .lbl { font-size: 10px; fill: #4F5D66; font-style: italic; }
+      .num { font-size: 15px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <!-- plate -->
+  <rect x="0" y="0" width="1200" height="760" rx="18" fill="#F6F8F6"/>
+
+  <!-- header -->
+  <text x="32" y="50" font-size="26" font-weight="700" fill="#14222C">From satellite embeddings to validated answers</text>
+  <text x="32" y="76" font-size="14" fill="#4F5D66">Find places like this one, map land cover, detect change. Pinal County, Arizona, 2023 and 2024. Every result is checked against independent labels.</text>
+
+  <!-- column headers -->
+  <text x="32" y="118" class="h" fill="#4F5D66">OPEN DATA</text>
+  <text x="262" y="118" class="h" fill="#0E7C7B">GOOGLE EARTH ENGINE</text>
+  <text x="508" y="118" class="h" fill="#9A6200">DATABRICKS LAKEHOUSE  ·  UNITY CATALOG</text>
+  <text x="944" y="118" class="h" fill="#4338A8">ANSWERS</text>
+
+  <!-- A: open data -->
+  <g>
+    <rect class="card" x="32" y="128" width="200" height="100" rx="10"/>
+    <text x="46" y="154" class="ct">Satellite Embedding</text>
+    <text x="46" y="174" class="cs">Google + DeepMind AlphaEarth</text>
+    <text x="46" y="192" class="cs">64 values per 10 m pixel</text>
+    <text x="46" y="210" class="cs">annual, 2017 to 2025</text>
+
+    <rect class="card" x="32" y="238" width="200" height="100" rx="10"/>
+    <text x="46" y="264" class="ct">Cropland Data Layer</text>
+    <text x="46" y="284" class="cs">USDA NASS reference labels</text>
+    <text x="46" y="302" class="cs">30 m, about 130 classes</text>
+    <text x="46" y="320" class="cs">confidence band in 2023</text>
+
+    <rect class="card" x="32" y="348" width="200" height="100" rx="10"/>
+    <text x="46" y="374" class="ct">TIGER counties</text>
+    <text x="46" y="394" class="cs">US Census Bureau</text>
+    <text x="46" y="412" class="cs">Pinal County boundary</text>
+
+    <rect class="card" x="32" y="458" width="200" height="100" rx="10"/>
+    <text x="46" y="484" class="ct">MODIS Burned Area</text>
+    <text x="46" y="504" class="cs">NASA MCD64A1</text>
+    <text x="46" y="522" class="cs">independent check on</text>
+    <text x="46" y="540" class="cs">detected change</text>
+  </g>
+
+  <!-- B: Earth Engine lane -->
+  <rect x="262" y="128" width="216" height="430" rx="14" fill="#E3F1EF" stroke="#0E7C7B" stroke-width="1.2"/>
+  <g>
+    <rect class="card" x="276" y="146" width="188" height="122" rx="10"/>
+    <text x="290" y="172" class="ct">Pure-pixel sample</text>
+    <text x="290" y="192" class="cs">stratified on the 30 m CDL,</text>
+    <text x="290" y="210" class="cs">embeddings read at points</text>
+    <text x="290" y="236" class="num" fill="#0E7C7B">52,000</text>
+    <text x="350" y="236" class="cs">pixels, 13 classes</text>
+    <text x="290" y="254" class="cs">2023 and 2024</text>
+
+    <rect class="card" x="276" y="282" width="188" height="122" rx="10"/>
+    <text x="290" y="308" class="ct">Wall-to-wall grid</text>
+    <text x="290" y="328" class="cs">200 m nodes, CONUS Albers</text>
+    <text x="290" y="346" class="cs">true 10 m pixel per node</text>
+    <text x="290" y="372" class="num" fill="#0E7C7B">696,008</text>
+    <text x="360" y="372" class="cs">rows</text>
+    <text x="290" y="390" class="cs">computePixels, no exports</text>
+
+    <rect class="card" x="276" y="418" width="188" height="122" rx="10"/>
+    <text x="290" y="444" class="ct">Python API</text>
+    <text x="290" y="464" class="cs">public catalog datasets only</text>
+    <text x="290" y="482" class="cs">server-side sampling,</text>
+    <text x="290" y="500" class="cs">small results pulled as</text>
+    <text x="290" y="518" class="cs">arrays, saved as Parquet</text>
+  </g>
+
+  <!-- C: Databricks lane -->
+  <rect x="508" y="128" width="420" height="430" rx="14" fill="#F7EEDC" stroke="#9A6200" stroke-width="1.2"/>
+  <g>
+    <rect class="card" x="524" y="146" width="392" height="52" rx="10"/>
+    <text x="538" y="167" class="st">UC Volume</text>
+    <text x="610" y="167" class="ss mono">/Volumes/workspace/geo_embeddings/raw</text>
+    <text x="538" y="186" class="ss">landing zone for Parquet from Earth Engine, governed like a table</text>
+
+    <rect class="card" x="524" y="214" width="124" height="92" rx="10"/>
+    <text x="536" y="236" class="st mono" font-size="11">samples_pinal</text>
+    <text x="536" y="254" class="ss">Delta table</text>
+    <text x="536" y="272" class="ss">52,000 rows</text>
+    <text x="536" y="290" class="ss">training labels</text>
+
+    <rect class="card" x="658" y="214" width="124" height="92" rx="10"/>
+    <text x="670" y="236" class="st mono" font-size="11">grid_pinal_200m</text>
+    <text x="670" y="254" class="ss">Delta, change feed on</text>
+    <text x="670" y="272" class="ss">696,008 rows</text>
+    <text x="670" y="290" class="ss">64-d embedding array</text>
+
+    <rect class="card" x="792" y="214" width="124" height="92" rx="10"/>
+    <text x="804" y="236" class="st mono" font-size="11">h3_pinal_r7</text>
+    <text x="804" y="254" class="ss">Delta, H3 level 7</text>
+    <text x="804" y="272" class="ss">2,455 hexagons</text>
+    <text x="804" y="290" class="ss">change per hexagon</text>
+
+    <rect class="card" x="524" y="322" width="124" height="110" rx="10"/>
+    <text x="536" y="344" class="st">Serverless SQL</text>
+    <text x="536" y="364" class="ss">change score as</text>
+    <text x="536" y="381" class="ss">array math in SQL,</text>
+    <text x="536" y="398" class="ss">built-in h3_ functions,</text>
+    <text x="536" y="415" class="ss">H3 roll-up in 29 s</text>
+
+    <rect class="card" x="658" y="322" width="124" height="110" rx="10"/>
+    <text x="670" y="344" class="st">MLflow</text>
+    <text x="670" y="364" class="ss">params, 62 metrics,</text>
+    <text x="670" y="381" class="ss">confidence intervals,</text>
+    <text x="670" y="398" class="ss">figures, git commit</text>
+    <text x="670" y="415" class="ss">and data hash per run</text>
+
+    <rect class="card" x="792" y="322" width="124" height="110" rx="10"/>
+    <text x="804" y="344" class="st">Vector Search</text>
+    <text x="804" y="364" class="ss">Standard endpoint,</text>
+    <text x="804" y="381" class="ss">Delta Sync index on</text>
+    <text x="804" y="398" class="ss">the grid table, 64-d,</text>
+    <text x="804" y="415" class="ss">filter by year</text>
+
+    <rect class="card" x="524" y="448" width="392" height="96" rx="10"/>
+    <text x="538" y="472" class="st">Modeling and validation</text>
+    <text x="902" y="472" class="ss" text-anchor="end">runs locally, tracked in MLflow</text>
+    <text x="538" y="492" class="ss">Random Forest on 64 embedding values, 5-fold CV on 10 km spatial blocks</text>
+    <text x="538" y="510" class="ss">block-bootstrap 95% intervals, failure analysis against CDL confidence</text>
+    <text x="538" y="532" class="num" fill="#9A6200">0.891</text>
+    <text x="586" y="532" class="ss">overall accuracy, spatial blocks (a random split would claim 0.955)</text>
+  </g>
+
+  <!-- D: Answers lane -->
+  <rect x="944" y="128" width="224" height="430" rx="14" fill="#ECEBF8" stroke="#4338A8" stroke-width="1.2"/>
+  <g>
+    <rect x="958" y="146" width="196" height="150" rx="10" fill="#FFFFFF" stroke="#4338A8" stroke-width="1.2" stroke-dasharray="5 4"/>
+    <text x="972" y="170" class="ct">Claude agents</text>
+    <rect x="1068" y="157" width="80" height="18" rx="9" fill="#4338A8"/>
+    <text x="1108" y="169.5" font-size="8.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.6">IN PROGRESS</text>
+    <text x="972" y="190" class="ss">Claude Agent SDK, Opus 5.5</text>
+    <text x="972" y="214" class="cs">planner</text>
+    <text x="972" y="232" class="cs">Earth Engine data agent</text>
+    <text x="972" y="250" class="cs">Databricks analysis agent</text>
+    <text x="972" y="268" class="cs">validation agent</text>
+    <text x="972" y="286" class="ss">questions in, maps and tables out</text>
+
+    <rect class="card" x="958" y="312" width="196" height="232" rx="10"/>
+    <text x="972" y="336" class="ct">What it finds today</text>
+    <text x="972" y="364" class="num" fill="#4338A8">0.98</text>
+    <text x="1012" y="364" class="ss">AUC, change score</text>
+    <text x="972" y="380" class="ss">on crop rotations</text>
+    <text x="972" y="410" class="num" fill="#4338A8">93%</text>
+    <text x="1010" y="410" class="ss">cotton among matches</text>
+    <text x="972" y="426" class="ss">more than 10 km away</text>
+    <text x="972" y="456" class="num" fill="#4338A8">2024</text>
+    <text x="1016" y="456" class="ss">burn scar the class</text>
+    <text x="972" y="472" class="ss">labels miss, confirmed by MODIS</text>
+    <text x="972" y="502" class="num" fill="#4338A8">13</text>
+    <text x="996" y="502" class="ss">land-cover classes, with</text>
+    <text x="972" y="518" class="ss">honest intervals per class</text>
+  </g>
+
+  <!-- flows -->
+  <path class="flow" d="M232,178 L260,178"/>
+  <path class="flow" d="M232,288 L260,288"/>
+  <path class="flow" d="M232,398 L260,398"/>
+  <path class="flow" d="M478,172 L506,172"/>
+  <text x="492" y="160" class="lbl" text-anchor="middle">Parquet</text>
+  <path class="flow" d="M584,198 L584,212"/>
+  <path class="flow" d="M720,198 L720,212"/>
+  <path class="flow" d="M854,198 L854,212"/>
+  <path class="flow" d="M584,306 L584,320"/>
+  <path class="flow" d="M720,306 L720,320"/>
+  <path class="flow" d="M854,306 L854,320"/>
+  <path class="flow" d="M928,377 L956,377"/>
+  <path class="flow" d="M928,221 L956,221"/>
+  <path class="flow" d="M1056,296 L1056,310"/>
+  <path class="flow" d="M132,558 L132,582"/>
+
+  <!-- validation spine -->
+  <rect x="32" y="584" width="1136" height="64" rx="12" fill="#14222C"/>
+  <text x="52" y="612" class="h" fill="#9FD9D3">VALIDATION</text>
+  <text x="52" y="630" class="h" fill="#9FD9D3">SPINE</text>
+  <g font-size="12.5" fill="#F6F8F6">
+    <circle cx="188" cy="616" r="4" fill="#0E7C7B"/>
+    <text x="198" y="620">10 km spatial block CV</text>
+    <circle cx="374" cy="616" r="4" fill="#9A6200"/>
+    <text x="384" y="620">block-bootstrap 95% intervals</text>
+    <circle cx="600" cy="616" r="4" fill="#C9A227"/>
+    <text x="610" y="620">errors vs CDL confidence</text>
+    <circle cx="800" cy="616" r="4" fill="#E07A5F"/>
+    <text x="810" y="620">MODIS burn cross-check</text>
+    <circle cx="986" cy="616" r="4" fill="#8B85E0"/>
+    <text x="996" y="620">SQL equals Python checks</text>
+  </g>
+
+  <!-- footer -->
+  <text x="32" y="690" font-size="12" fill="#14222C" font-weight="700">Built with</text>
+  <text x="100" y="690" font-size="12" fill="#4F5D66">Claude Code with Databricks agent skills, Claude Agent SDK, Python, scikit-learn, MLflow, Earth Engine Python API</text>
+  <text x="32" y="716" font-size="10.5" fill="#4F5D66">Embeddings: The AlphaEarth Foundations Satellite Embedding dataset is produced by Google and Google DeepMind (CC-BY 4.0). Labels: USDA NASS Cropland Data Layer.</text>
+  <text x="32" y="734" font-size="10.5" fill="#4F5D66">Burned area: NASA MODIS MCD64A1. Boundary: US Census TIGER 2018. Figures from code in this repository.</text>
+</svg>

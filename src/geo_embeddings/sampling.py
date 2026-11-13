@@ -28,12 +28,12 @@ def county_geometry(statefp: str, countyfp: str) -> ee.Geometry:
     return fc.geometry()
 
 
-def label_image(year: int) -> ee.Image:
-    """Return bands label, cdl_code and cdl_conf for one year.
+def cdl_layers(year: int) -> ee.Image:
+    """Return unmasked CDL layers for one year on the CDL 30 m grid.
 
-    label is the grouped class id, masked where the class is excluded or the
-    3x3 CDL neighborhood is mixed. cdl_conf is NO_CONFIDENCE when the CDL
-    year has no confidence band (only some years include it).
+    Bands: cdl_code (raw CDL code), label_any (grouped class id, or EXCLUDED_ID),
+    pure (1 where the 3x3 CDL neighborhood has one grouped class) and cdl_conf
+    (CDL confidence, or NO_CONFIDENCE for years without that band).
     """
     cdl = ee.Image(f"{CDL_COLLECTION}/{year}")
     code = cdl.select("cropland")
@@ -42,8 +42,6 @@ def label_image(year: int) -> ee.Image:
     n_distinct = grouped.reduceNeighborhood(
         reducer=ee.Reducer.countDistinct(), kernel=ee.Kernel.square(1, "pixels")
     ).reproject(code.projection())
-    label = grouped.updateMask(n_distinct.eq(1)).updateMask(grouped.neq(EXCLUDED_ID))
-
     conf = ee.Image(
         ee.Algorithms.If(
             cdl.bandNames().contains("confidence"),
@@ -52,10 +50,24 @@ def label_image(year: int) -> ee.Image:
         )
     )
     return ee.Image.cat(
-        label.rename("label").toInt(),
         code.rename("cdl_code").toInt(),
+        grouped.rename("label_any").toInt(),
+        n_distinct.eq(1).rename("pure").toInt(),
         conf.rename("cdl_conf").toInt(),
     )
+
+
+def label_image(year: int) -> ee.Image:
+    """Return bands label, cdl_code and cdl_conf for one year.
+
+    label is the grouped class id, masked where the class is excluded or the
+    3x3 CDL neighborhood is mixed. cdl_conf is NO_CONFIDENCE when the CDL
+    year has no confidence band (only some years include it).
+    """
+    layers = cdl_layers(year)
+    grouped = layers.select("label_any")
+    label = grouped.updateMask(layers.select("pure")).updateMask(grouped.neq(EXCLUDED_ID))
+    return ee.Image.cat(label.rename("label"), layers.select(["cdl_code", "cdl_conf"]))
 
 
 def sample_year(
