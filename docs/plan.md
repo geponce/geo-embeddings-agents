@@ -28,6 +28,9 @@
   - [x] Vector Search endpoint `geo-embeddings-vs` (Standard) and Delta Sync index `grid_pinal_200m_index`, checked against exact search (`python -m geo_embeddings.search_eval --vs`)
   - [x] Architecture diagram `docs/architecture.svg` and write-up `docs/overview.md`
 - [ ] 5. Agents (planner, EE data, Databricks analysis, validation)
+  - [x] Read-only tools with tests (`src/geo_embeddings/agent_tools.py`, SQL guard in `sql_guard.py`), each checked directly against Databricks and Earth Engine
+  - [x] Team on the Claude Agent SDK (`agents/team.py`) and a CLI (`python -m agents.run "question"`)
+  - [ ] First live runs (needs an Anthropic credential, decided later), then a small set of test questions with expected answers
 - [ ] 6. Polish (README, diagram, results, limitations, demo)
 
 ## Decisions
@@ -70,6 +73,11 @@
 
 - 2026-11-13: Vector Search index ready after about 34 minutes of initial sync (696,008 vectors). Against exact cosine search over 20 random 2024 queries, top 50 overlap averages 0.84 (lowest 0.54, in dense shrubland). Every swapped-in result is within 0.005 cosine of the exact 50th result, and the share of matches in the query's CDL class is the same (0.854 exact, 0.857 index). The approximation does not change answer quality. Query latency from the laptop through the SDK, network included, is median 246 ms and 90th percentile 314 ms. The write-up says "about a quarter of a second", not milliseconds.
 - 2026-11-13: Architecture diagram (SVG, renders on GitHub, own light background) and a public write-up in docs/overview.md. Every platform claim was checked in the workspace first. Delta history for samples_pinal has 18 versions. Unity Catalog lineage links volume files to tables and the grid table to the index. A private preview page combines both with the key figures. Nothing pushed to GitHub. The plan is to push once, when the whole project is done.
+
+- 2026-11-13: Stage 5 design. Claude Agent SDK 0.2.180 (docs checked first), model claude-opus-5-5. A planner leads three subagents (earth-engine-data, databricks-analyst, validator) defined with AgentDefinition, each limited to its own tools. Nine custom tools on an in-process MCP server, all read-only. Built-in tools are removed (`tools=["Agent"]`), project settings and CLAUDE.md are not loaded (`setting_sources=[]`), spend is capped per question (`max_budget_usd`, default 3) and subagents cannot spawn their own (depth 1, at most 4 at once). The planner must send its draft to the validator before answering and may not state numbers no agent returned.
+- 2026-11-13: SQL written by agents goes through a guard. One SELECT or WITH statement only, no write or admin keywords, no file, network, secret or AI functions, no system tables or other catalogs, only the three project tables, wrapped with LIMIT 200. Ten unsafe patterns are tested.
+- 2026-11-13: Tool checks without a model. Cotton search returned 86% cotton among 50 matches beyond 10 km. The non-farm hotspot tool puts the 2024 burn scar first. At the burn site CDL says Shrubland every year from 2021 to 2025 (confidence 92 to 100 where reported), the grid node changed by 0.170, and MODIS shows 100% burned in 2024 (day 194). Two bugs found and fixed. SQL returns array elements as strings, and pandas 3 keeps missing values as floats after astype(str). The change evidence text first mentioned the burn finding, which would let the validator confirm it by reading our own conclusion. That sentence was removed so the check stays independent.
+- 2026-11-13: No live agent run yet. There is no Anthropic API key on this machine and the choice of credential was deferred. data/outputs/ added to .gitignore so saved maps and answers stay local.
 
 ## Open questions
 - Area-weighted accuracy for a real map (weight per-class accuracy by class area, or validate on a random rather than stratified sample)

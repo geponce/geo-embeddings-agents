@@ -1,6 +1,7 @@
 # data stays local (exports can be large)
 data/raw/*
 data/processed/*
+data/outputs/
 !data/**/.gitkeep
 # secrets and credentials
 .env
