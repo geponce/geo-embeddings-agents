@@ -41,12 +41,19 @@ These steps reproduce the current state of the project.
    databricks catalogs list --profile geo-embeddings  # lists Unity Catalog catalogs
    pytest
    ```
+6. Build the Stage 2 sample (about 10 minutes) and load it into Databricks as a Delta table.
+   ```
+   python -m geo_embeddings.build_samples        # writes data/processed/*.parquet
+   databricks/load_samples.sh                    # creates workspace.geo_embeddings.samples_pinal
+   ```
+
+## Data so far
+44,000 labeled pixels from Pinal County, Arizona. For 2023 and 2024 there are 2,000 pixels for each of 11 land-cover classes grouped from the Cropland Data Layer. Each pixel has its 64 embedding values, its original CDL code and location. Only pixels inside a uniform 90 m block of one class are kept, which avoids label errors at field edges.
 
 ## Data sources
-- Google Satellite Embedding (Earth Engine Data Catalog)
-- USDA NASS Cropland Data Layer
-
-Terms of use and citations will be listed here before results are published.
+- **Google Satellite Embedding** (`GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`), licensed CC-BY 4.0. The AlphaEarth Foundations Satellite Embedding [dataset](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL) is produced by Google and Google DeepMind.
+- **USDA NASS Cropland Data Layer** (`USDA/NASS/CDL`). Public domain. Thanks to USDA NASS for the CDL.
+- **US Census TIGER 2018 counties** (`TIGER/2018/Counties`) for the Pinal County boundary.
 
 ## Author
 Guillermo Ponce, PhD. Remote sensing data scientist, Tucson, Arizona.

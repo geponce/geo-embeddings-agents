@@ -9,7 +9,8 @@ dependencies:
   - rasterio
   - xarray
   - pandas
-  - numpy
+  - numpy>=2
+  - pyarrow
   - scikit-learn
   - matplotlib
   - jupyterlab
@@ -19,6 +20,7 @@ dependencies:
   - pip:
       - -e .
       - databricks-sdk
-      - databricks-connect
+      # databricks-connect is left out: on Python 3.11 its latest release pins numpy<2,
+      # which breaks pyarrow and scikit-learn. Not needed (Databricks code runs in the workspace).
       - mlflow
       - claude-agent-sdk
