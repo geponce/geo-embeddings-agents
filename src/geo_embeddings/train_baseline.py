@@ -59,6 +59,8 @@ def main() -> None:
     parser.add_argument("--block-km", type=float, default=10)
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--mlflow", action="store_true",
+                        help="log the run to MLflow in the Databricks workspace")
     parser.add_argument("--class-weight", choices=["none", "balanced"], default="balanced",
                         help="'balanced' weights classes by inverse frequency (matters if counts differ)")
     args = parser.parse_args()
@@ -122,6 +124,12 @@ def main() -> None:
                    f"Random Forest, {args.folds}-fold CV, {title_cv} "
                    f"(OA {m['overall_accuracy']:.2f}, Kappa {m['kappa']:.2f})", fig_path)
     print(f"\nwrote {pred_path}, {res_path}, {fig_path}")
+
+    if args.mlflow:
+        from geo_embeddings.tracking import log_cv_run
+
+        run_id = log_cv_run(results, run_name=tag, data_path=SAMPLES, artifacts=[res_path, fig_path])
+        print(f"logged MLflow run {run_id}")
 
 
 if __name__ == "__main__":
