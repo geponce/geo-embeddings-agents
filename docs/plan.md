@@ -13,13 +13,13 @@
   - [x] Group CDL codes into 11 classes (`classes.py`)
   - [x] Stratified sample of pure pixels, 2023 and 2024, 2000 per class per year (`python -m geo_embeddings.build_samples`)
   - [x] Parquet in `data/processed/`, Delta table `workspace.geo_embeddings.samples_pinal` (`databricks/load_samples.sh`)
-- [ ] 3. Model and validation (MLflow, spatially separated test set, per-class metrics, failure cases)
+- [x] 3. Model and validation (done 2026-11-13)
   - [x] Choose spatial block size from same-class similarity vs distance (`python -m geo_embeddings.block_size`, `docs/figures/similarity_vs_distance.png`)
   - [x] Random Forest baseline with spatial block CV, overall accuracy, per-class F1, Kappa, confusion matrix (`python -m geo_embeddings.train_baseline`)
   - [x] Same model with a random split, to show how much a random split overstates accuracy (`--cv random`, `python -m geo_embeddings.compare_cv`)
   - [x] Failure analysis (errors vs CDL confidence, confused class pairs) (`python -m geo_embeddings.failure_analysis`)
   - [x] Class scheme v2 with Double crop and Orchards, block-bootstrap confidence intervals
-  - [ ] Log runs to MLflow on Databricks
+  - [x] Log runs to MLflow on Databricks (`train_baseline --mlflow`, experiment `geo-embeddings-agents/landcover-classification` in the user's workspace folder)
 - [ ] 4. Similarity search and change score (Vector Search, maps)
 - [ ] 5. Agents (planner, EE data, Databricks analysis, validation)
 - [ ] 6. Polish (README, diagram, results, limitations, demo)
@@ -50,6 +50,8 @@
 - 2026-11-12: Added 95% confidence intervals by block bootstrap (resample whole 10 km blocks, 1000 times) because pixels in a block are not independent. A class in few blocks gets a wide interval.
 - 2026-11-12: v2 results, spatial CV. OA 0.891 [0.868, 0.913], Kappa 0.882 [0.857, 0.904]. Random split OA 0.955, so a random split hides about 59% of the errors (4.5% vs 10.9%). Per-class F1 with CI and blocks: Cotton 0.966 [0.950, 0.978] 45 blocks, Developed 0.964, Barren 0.943, Alfalfa 0.937, Woody 0.937, Shrubland 0.890, Orchards 0.887 [0.722, 0.971] 40 blocks, Small grains 0.867, Other crops 0.865 [0.772, 0.907], Grass/Pasture 0.857, Corn+Sorghum 0.851 [0.806, 0.888], Fallow/Idle 0.833, Double crop 0.781 [0.687, 0.841] 21 blocks.
 - 2026-11-12: What the split changed. Other crops F1 rose from 0.814 to 0.865. Corn+Sorghum fell from 0.922 to 0.851 because it is now confused with Double crop in both directions. Double crop is mostly predicted as its own component crops, Corn+Sorghum (18%) and Small grains (9%), which makes sense for an annual embedding of a winter grain followed by corn. Orchards is held up by one place. A single block near Maricopa (lon -111.88, lat 33.07) holds 902 of 4000 Orchards samples and has 43% error, which is why its interval is the widest (0.25). Double crop has 60% of samples in 3 blocks. The largest random vs spatial gaps are now Double crop +0.19, Corn+Sorghum +0.12, Orchards +0.09.
+
+- 2026-11-13: MLflow tracking. Training stays local (52,000 rows, about 30 s per CV run) and logs to the Databricks workspace MLflow. Each run has RF params, CV settings, 62 metrics (pooled, 95% block-bootstrap bounds, per-class F1 with bounds and block counts, per-fold values), the results JSON and confusion figure, and tags for git commit and the SHA-256 of the sample file. The experiment path is built from the signed-in user at run time, so no user name is in the code. No model registered in Unity Catalog yet. Register a final model in Stage 4 when it is needed for maps.
 
 ## Open questions
 - Area-weighted accuracy for a real map (weight per-class accuracy by class area, or validate on a random rather than stratified sample)

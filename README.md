@@ -50,6 +50,21 @@ These steps reproduce the current state of the project.
 ## Data so far
 52,000 labeled pixels from Pinal County, Arizona. For 2023 and 2024 there are 2,000 pixels for each of 13 land-cover classes grouped from the Cropland Data Layer. Each pixel has its 64 embedding values, its original CDL code and location. Only pixels inside a uniform 90 m block of one class are kept, which avoids label errors at field edges.
 
+## Results so far (Stage 3)
+A Random Forest on the 64 embedding values, validated with 5-fold cross-validation on 10 km spatial blocks so that nearby pixels never sit on both sides of the split. Intervals are 95% block-bootstrap intervals.
+
+| | Spatial blocks (honest) | Random split |
+|---|---|---|
+| Overall accuracy | 0.891 (0.868 to 0.913) | 0.955 |
+| Kappa | 0.882 (0.857 to 0.904) | 0.951 |
+
+- A random split hides about 59% of the errors. The gap is largest for spatially clustered crop classes such as Double crop, Corn+Sorghum and Orchards.
+- Errors follow the reference label quality. Where the 2023 CDL confidence is under 50%, the model disagrees with CDL 30% of the time. At 99 to 100% confidence it disagrees 4% of the time.
+- Cotton and Developed are the most reliable classes (F1 about 0.97). Double crop is the weakest (F1 0.78) and is mostly confused with its own component crops. Orchards scores F1 0.89, but the interval runs from 0.72 to 0.97 because one farm block holds about a quarter of its samples.
+- These numbers measure agreement with CDL on a class-balanced sample of pure pixels. They are not the accuracy of a wall-to-wall map.
+
+Figures are in `docs/figures/`, metrics in `docs/results/`, and every run is logged to MLflow on Databricks. To reproduce, run `python -m geo_embeddings.train_baseline` (add `--cv random` for the comparison and `--mlflow` to log the run).
+
 ## Data sources
 - **Google Satellite Embedding** (`GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`), licensed CC-BY 4.0. The AlphaEarth Foundations Satellite Embedding [dataset](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL) is produced by Google and Google DeepMind.
 - **USDA NASS Cropland Data Layer** (`USDA/NASS/CDL`). Public domain. Thanks to USDA NASS for the CDL.
