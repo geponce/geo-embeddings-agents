@@ -48,7 +48,7 @@ These steps reproduce the current state of the project.
    ```
 
 ## Data so far
-44,000 labeled pixels from Pinal County, Arizona. For 2023 and 2024 there are 2,000 pixels for each of 11 land-cover classes grouped from the Cropland Data Layer. Each pixel has its 64 embedding values, its original CDL code and location. Only pixels inside a uniform 90 m block of one class are kept, which avoids label errors at field edges.
+52,000 labeled pixels from Pinal County, Arizona. For 2023 and 2024 there are 2,000 pixels for each of 13 land-cover classes grouped from the Cropland Data Layer. Each pixel has its 64 embedding values, its original CDL code and location. Only pixels inside a uniform 90 m block of one class are kept, which avoids label errors at field edges.
 
 ## Data sources
 - **Google Satellite Embedding** (`GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`), licensed CC-BY 4.0. The AlphaEarth Foundations Satellite Embedding [dataset](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL) is produced by Google and Google DeepMind.

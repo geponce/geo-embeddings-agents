@@ -1,8 +1,13 @@
 """Group USDA Cropland Data Layer (CDL) codes into the project's training classes.
 
 The CDL has about 130 codes. Pinal County, Arizona uses about 45 of them, most
-covering tiny areas. We group them into 11 classes that are common enough to
-sample and meaningful for a land-cover map. Codes for water, wetland marsh,
+covering tiny areas. We group them into 13 classes that are common enough to
+sample and meaningful for a land-cover map.
+
+Version 2 (2026-11-12) split two groups out of "Other crops" after the Stage 3
+failure analysis. Double crops (two crops in one year, mostly a winter grain
+then corn) were mostly predicted as Corn+Sorghum, and tree crops were predicted
+as Woody or Shrubland. Both now have their own class. Codes for water, wetland marsh,
 snow and background are excluded (EXCLUDED_ID).
 
 CDL code list: https://www.nass.usda.gov/Research_and_Science/Cropland/metadata/
@@ -25,7 +30,15 @@ CLASS_NAMES: dict[int, str] = {
     8: "Developed",
     9: "Barren",
     10: "Woody",
+    11: "Double crop",
+    12: "Orchards",
 }
+
+# CDL double-crop codes ("Dbl Crop ..." in the CDL class names).
+DOUBLE_CROP_CODES = frozenset({26, *range(225, 242), 254})
+# Perennial tree and vine crops (orchards, groves, vineyards, tree plantations).
+ORCHARD_CODES = frozenset({66, 67, 68, 69, 70, 71, 72, 74, 75, 76, 77,
+                           204, 210, 211, 212, 215, 217, 218, 220, 223})
 
 # Explicit CDL code -> class id. Codes 63-65 and 62 are older CDL codes kept for safety.
 _EXPLICIT: dict[int, int] = {
@@ -49,6 +62,10 @@ def cdl_to_class(code: int) -> int:
     """Return the class id for one CDL code, or EXCLUDED_ID if it is not used."""
     if code in _EXPLICIT:
         return _EXPLICIT[code]
+    if code in DOUBLE_CROP_CODES:
+        return 11
+    if code in ORCHARD_CODES:
+        return 12
     if any(code in r for r in _CROP_RANGES):
         return 6
     return EXCLUDED_ID

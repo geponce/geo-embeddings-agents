@@ -25,7 +25,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 from geo_embeddings.classes import CLASS_NAMES
 from geo_embeddings.embeddings import band_names
-from geo_embeddings.validation import cross_validate, evaluate, random_folds, spatial_folds
+from geo_embeddings.validation import block_bootstrap, cross_validate, evaluate, random_folds, spatial_folds
 
 SAMPLES = Path("data/processed/pinal_samples_2023_2024_n2000.parquet")
 RF_PARAMS = {"n_estimators": 300, "min_samples_leaf": 1, "max_features": "sqrt", "n_jobs": -1}
@@ -59,7 +59,10 @@ def main() -> None:
     parser.add_argument("--block-km", type=float, default=10)
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--class-weight", choices=["none", "balanced"], default="balanced",
+                        help="'balanced' weights classes by inverse frequency (matters if counts differ)")
     args = parser.parse_args()
+    rf_params = {**RF_PARAMS, "class_weight": None if args.class_weight == "none" else "balanced"}
 
     df = pd.read_parquet(SAMPLES)
     X = df[band_names()].to_numpy()
@@ -81,7 +84,7 @@ def main() -> None:
     print(pd.crosstab(df.class_name, folds).to_string(), "\n")
 
     oof, per_fold = cross_validate(
-        lambda: RandomForestClassifier(**RF_PARAMS, random_state=args.seed), X, y, folds, labels
+        lambda: RandomForestClassifier(**rf_params, random_state=args.seed), X, y, folds, labels
     )
     m = evaluate(y, oof, labels)
 
@@ -91,19 +94,25 @@ def main() -> None:
           f" | macro F1 {m['macro_f1']:.3f}")
     print(f"across folds: OA {per_fold.overall_accuracy.mean():.3f} ± {per_fold.overall_accuracy.std():.3f}"
           f" | Kappa {per_fold.kappa.mean():.3f} ± {per_fold.kappa.std():.3f}")
-    print("\nF1 per class:")
-    for c, f in sorted(m["f1_per_class"].items(), key=lambda kv: -kv[1]):
-        print(f"  {CLASS_NAMES[c]:<14} {f:.3f}")
+    # 95% intervals by resampling whole 10 km blocks (pixels in a block are not independent).
+    boot = block_bootstrap(y, oof, blocks, labels, n_boot=1000, seed=args.seed)
+    lo, hi = boot["overall_accuracy"]["ci"]
+    print(f"block bootstrap 95% CI: OA [{lo:.3f}, {hi:.3f}]"
+          f" | Kappa [{boot['kappa']['ci'][0]:.3f}, {boot['kappa']['ci'][1]:.3f}]")
+    print("\nF1 per class (95% block-bootstrap CI, blocks containing the class):")
+    for c, f in sorted(boot["f1_per_class"].items(), key=lambda kv: -kv[1]["value"]):
+        print(f"  {CLASS_NAMES[c]:<14} {f['value']:.3f}  [{f['ci'][0]:.3f}, {f['ci'][1]:.3f}]"
+              f"  width {f['ci'][1] - f['ci'][0]:.3f}  blocks {f['n_blocks']}")
 
     out = df[["year", "label", "class_name", "cdl_code", "cdl_conf", "lon", "lat"]].assign(
         block=blocks, fold=folds, pred=oof, pred_name=pd.Series(oof).map(CLASS_NAMES).to_numpy())
     pred_path = Path(f"data/processed/oof_{tag}.parquet")
     out.to_parquet(pred_path, index=False)
 
-    results = {"model": "RandomForestClassifier", "params": RF_PARAMS, "cv": cv_desc,
+    results = {"model": "RandomForestClassifier", "params": rf_params, "cv": cv_desc,
                "block_km": args.block_km if args.cv == "spatial" else None, "n_folds": args.folds, "seed": args.seed,
                "n_rows": int(len(df)), "class_names": {int(k): v for k, v in CLASS_NAMES.items()},
-               "pooled": m, "per_fold": per_fold.to_dict(orient="records")}
+               "pooled": m, "block_bootstrap": boot, "per_fold": per_fold.to_dict(orient="records")}
     res_path = Path(f"docs/results/{tag}.json")
     res_path.parent.mkdir(parents=True, exist_ok=True)
     res_path.write_text(json.dumps(results, indent=2))

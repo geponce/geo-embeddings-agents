@@ -11,7 +11,7 @@ FROM read_files(
   format => 'parquet'
 );
 
-ALTER TABLE workspace.geo_embeddings.samples_pinal ALTER COLUMN label COMMENT 'Grouped class id 0-10 (see src/geo_embeddings/classes.py)';
+ALTER TABLE workspace.geo_embeddings.samples_pinal ALTER COLUMN label COMMENT 'Grouped class id 0-12, class scheme v2 (see src/geo_embeddings/classes.py)';
 ALTER TABLE workspace.geo_embeddings.samples_pinal ALTER COLUMN cdl_code COMMENT 'Original USDA CDL cropland code';
 ALTER TABLE workspace.geo_embeddings.samples_pinal ALTER COLUMN cdl_conf COMMENT 'CDL per-pixel confidence 0-100, or -1 when the CDL year has no confidence band (2024)';
 ALTER TABLE workspace.geo_embeddings.samples_pinal ALTER COLUMN lon COMMENT 'Longitude of the CDL 30 m pixel center (WGS84)';

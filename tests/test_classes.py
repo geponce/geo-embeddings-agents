@@ -25,9 +25,16 @@ def test_major_pinal_codes() -> None:
 
 def test_unlisted_crops_become_other_crops() -> None:
     assert cdl_to_class(37) == 6    # Other hay
-    assert cdl_to_class(74) == 6    # Pecans
     assert cdl_to_class(43) == 6    # Potatoes
-    assert cdl_to_class(226) == 6   # Double crop oats/corn
+    assert cdl_to_class(47) == 6    # Misc vegs and fruits
+    assert cdl_to_class(242) == 6   # Cabbage (not a double crop despite the code range)
+
+
+def test_double_crops_and_orchards() -> None:
+    for code in (26, 225, 226, 228, 236, 241, 254):  # Dbl Crop codes
+        assert cdl_to_class(code) == 11
+    for code in (72, 74, 204, 211, 212, 69):         # citrus, pecans, pistachios, olives, oranges, grapes
+        assert cdl_to_class(code) == 12
 
 
 def test_excluded_codes() -> None:
