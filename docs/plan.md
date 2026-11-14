@@ -30,7 +30,8 @@
 - [ ] 5. Agents (planner, EE data, Databricks analysis, validation)
   - [x] Read-only tools with tests (`src/geo_embeddings/agent_tools.py`, SQL guard in `sql_guard.py`), each checked directly against Databricks and Earth Engine
   - [x] Team on the Claude Agent SDK (`agents/team.py`) and a CLI (`python -m agents.run "question"`)
-  - [ ] First live runs (needs an Anthropic credential, decided later), then a small set of test questions with expected answers
+  - [x] Scripted tool walkthroughs with no model calls (`python -m agents.demo`, output in `docs/examples/`)
+  - [ ] Optional: live runs with an Anthropic API key, then a small set of test questions with expected answers
 - [ ] 6. Polish (README, diagram, results, limitations, demo)
 
 ## Decisions

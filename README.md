@@ -91,6 +91,11 @@ A Random Forest on the 64 embedding values, validated with 5-fold cross-validati
 
 Figures are in `docs/figures/`, metrics in `docs/results/`, and every run is logged to MLflow on Databricks. To reproduce, run `python -m geo_embeddings.train_baseline` (add `--cv random` for the comparison and `--mlflow` to log the run).
 
+## Agents (Stage 5)
+A planner agent leads three specialists built on the Claude Agent SDK. An Earth Engine agent fetches live per-place data, a Databricks agent runs read-only SQL, Vector Search and H3 hotspots, and a validator checks each claim against the stored validation results and independent data. Every tool is read-only and spend is capped per question.
+
+[docs/examples/](docs/examples/) shows three worked questions as tool walkthroughs. They run the agents' tools in a fixed order, with no language model and no token cost, so every number there comes straight from Databricks or Earth Engine. Run them with `python -m agents.demo`. With an Anthropic API key in `.env`, `python -m agents.run "question"` runs the full team.
+
 ## Data sources
 - **Google Satellite Embedding** (`GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`), licensed CC-BY 4.0. The AlphaEarth Foundations Satellite Embedding [dataset](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL) is produced by Google and Google DeepMind.
 - **USDA NASS Cropland Data Layer** (`USDA/NASS/CDL`). Public domain. Thanks to USDA NASS for the CDL.
