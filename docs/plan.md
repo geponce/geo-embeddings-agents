@@ -33,6 +33,12 @@
   - [x] Scripted tool walkthroughs with no model calls (`python -m agents.demo`, output in `docs/examples/`)
   - [ ] Optional: live runs with an Anthropic API key, then a small set of test questions with expected answers
 - [ ] 6. Polish (README, diagram, results, limitations, demo)
+  - [x] Final README (results, limitations, reproduce, layout, MODIS citation), diagram badge, overview updated
+  - [x] Demo notebook `notebooks/demo.ipynb` that runs from committed files
+  - [x] Versions pinned in `environment.yml`, unused geemap, rasterio and xarray removed
+  - [x] Secret check over the full git history
+  - [x] MIT license, CLAUDE.md kept local and removed from history
+  - [ ] Public push to GitHub
 
 ## Decisions
 - 2026-11-12: Project created. Start region Pinal County, Arizona (farmland and rangeland). Agents with Claude Agent SDK and Claude Opus 5.5. Databricks Free Edition.

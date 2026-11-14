@@ -2,25 +2,24 @@ name: geo-embeddings
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
-  - earthengine-api
-  - geemap
-  - geopandas
-  - rasterio
-  - xarray
-  - pandas
-  - numpy>=2
-  - pyarrow
-  - scikit-learn
-  - matplotlib
-  - jupyterlab
-  - pytest
-  - python-dotenv
+  - python=3.11.18
+  - earthengine-api=1.7.52
+  - geopandas=1.2.0
+  - shapely=2.2.0
+  - pandas=3.0.6
+  - numpy=2.4.6
+  - pyarrow=26.0.1
+  - scikit-learn=1.9.1
+  - matplotlib=3.11.2
+  - jupyterlab=4.6.6
+  - pytest=9.2.0
+  - python-dotenv=1.2.4
   - pip
   - pip:
       - -e .
-      - databricks-sdk
+      - databricks-sdk==0.166.0
       # databricks-connect is left out: on Python 3.11 its latest release pins numpy<2,
       # which breaks pyarrow and scikit-learn. Not needed (Databricks code runs in the workspace).
-      - mlflow
-      - claude-agent-sdk
+      - mlflow==3.18.0
+      - claude-agent-sdk==0.2.180
+      - mcp==2.3.0

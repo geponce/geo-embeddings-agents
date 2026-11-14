@@ -39,7 +39,7 @@ The embeddings are not labels and not ground truth. They need a reference to say
 
 **4. Search and change run on the lakehouse.** A Vector Search index over the grid table answers "find places like this one." Serverless SQL computes the change score and the H3 summaries.
 
-**5. Agents answer questions (in progress).** A small team of Claude agents built with the Claude Agent SDK will take plain-language questions, call Earth Engine and Databricks as tools, and return maps and tables with the uncertainty stated. A planner splits the question, data and analysis agents do the work, and a validation agent checks the answer against labels before it is returned.
+**5. Agents answer questions.** A small team of Claude agents built with the Claude Agent SDK takes plain-language questions, calls Earth Engine and Databricks through nine read-only tools, and returns maps and tables with the uncertainty stated. A planner splits the question and delegates to an Earth Engine data agent and a Databricks analysis agent. A validation agent checks each claim against the stored validation results and against independent data such as the CDL history and MODIS burned area before the answer is returned. Shell and file tools are removed, SQL must pass a guard that allows only SELECT on the three project tables, and spend is capped per question. Scripted walkthroughs of the tools on three questions are in [docs/examples](examples/).
 
 ## Why Databricks for a remote sensing project
 
@@ -55,7 +55,7 @@ Earth observation work usually ends up as folders of GeoTIFFs and CSVs, scripts 
 
 **Vector Search turns embeddings into a product feature.** A Delta Sync index on the grid table serves nearest-neighbor queries with a year filter, and it stays in step with the table. That is what lets an application or an agent ask "where else looks like this?" without scanning hundreds of thousands of vectors. From a laptop a query takes about a quarter of a second, network included. Against exact search the index returns 84% of the same top 50 places on average, and every place it swaps in is within 0.005 cosine of the one it replaced. The share of matches in the query's class is the same either way (86%).
 
-**The same platform serves the agents.** The tables, SQL warehouse and vector index the analysis uses are the same ones the agents will call. There is no separate serving copy to keep in sync.
+**The same platform serves the agents.** The tables, SQL warehouse and vector index the analysis uses are the same ones the agents call. There is no separate serving copy to keep in sync.
 
 The project runs on the Databricks Free Edition. It allows one Vector Search endpoint and one small SQL warehouse, which was enough for a county.
 
@@ -97,7 +97,8 @@ In this project the H3 table compares two views of change for each hexagon, the 
 - Orchards and double crops come from few places, so their scores have wide intervals.
 - One county and two years. Results may not carry over to other regions without new validation.
 - The embedding images are processed in tiles, and a faint seam is visible in the change map along 111° W.
-- The agents are still being built.
+- The agent team is built and its tools are tested against the live tables and Earth Engine, but the full team has not been run with a model in this repository. The files in [docs/examples](examples/) are scripted tool walkthroughs, not agent answers.
+- A change threshold of 0.14 works well for areas, but single pixels near it can go either way. In the burn scar, 93% of a hexagon's nodes changed while the pixel at its center scored 0.124.
 
 ## Reproduce
 

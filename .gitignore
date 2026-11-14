@@ -16,6 +16,7 @@ __pycache__/
 # os
 .DS_Store
 
-# private Claude notes
+# private Claude notes (project guide stays local)
+CLAUDE.md
 CLAUDE.local.md
 *.egg-info/
